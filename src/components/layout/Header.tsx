@@ -1,7 +1,9 @@
 import React from 'react';
 import { Sun, Moon, Bookmark } from 'lucide-react';
+import { APP_TITLE } from '../../services/api';
 
 interface HeaderProps {
+  title?: string;
   currentTheme: 'light' | 'dark';
   onToggleTheme: () => void;
   bookmarkCount: number;
@@ -11,6 +13,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
+  title = APP_TITLE,
   currentTheme,
   onToggleTheme,
   bookmarkCount,
@@ -21,13 +24,13 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="w-full bg-white dark:bg-[#18191e] border-b border-[#e6e7eb] dark:border-[rgba(255,255,255,0.12)] transition-colors duration-200">
       <div className="max-w-[1120px] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
-        {/* Just title: Minimal Blogs */}
+        {/* Blog Title / Logo */}
         <div
           onClick={onNavigateHome}
           className="cursor-pointer group select-none"
         >
           <span className="text-xl sm:text-2xl font-bold tracking-tight text-[#121316] dark:text-[#f0f0f2] group-hover:text-[#1976d2] dark:group-hover:text-[#90caf9] transition-colors">
-            Minimal Blogs
+            {title}
           </span>
         </div>
 

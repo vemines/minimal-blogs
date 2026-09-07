@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:helpdesk": "vite --mode helpdesk",
     "build": "tsc -b && vite build",
+    "build:helpdesk": "tsc -b && vite build --mode helpdesk",
     "lint": "oxlint",
     "preview": "vite preview",
     "generate": "node scripts/generate-posts.js",

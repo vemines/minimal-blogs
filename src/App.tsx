@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import type { PostMeta, TagItem } from './types/blog';
-import { fetchPosts, fetchTags, fetchPinnedIds, getAppBase } from './services/api';
+import { fetchPosts, fetchTags, fetchPinnedIds, getAppBase, APP_TITLE, APP_FOOTER } from './services/api';
 import { storage } from './services/storage';
 import { Header } from './components/layout/Header';
 import { HomeView } from './views/HomeView';
@@ -186,6 +186,17 @@ export function App() {
 
   const currentPostMeta = posts.find((p) => p.id === currentPostId);
 
+  // Sync browser document title with dynamic APP_TITLE
+  useEffect(() => {
+    if (currentPostId !== null && currentPostMeta) {
+      document.title = `${currentPostMeta.title} - ${APP_TITLE}`;
+    } else if (isSavedRoute) {
+      document.title = `Bài viết đã lưu - ${APP_TITLE}`;
+    } else {
+      document.title = APP_TITLE;
+    }
+  }, [currentPostId, currentPostMeta, isSavedRoute]);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#fafafa] dark:bg-[#0c0d0e] text-[#121316] dark:text-[#f0f0f2] transition-colors duration-200">
       {/* Header */}
@@ -260,7 +271,7 @@ export function App() {
       <footer className="w-full py-4 border-t border-[#e2e8f0] dark:border-[rgba(255,255,255,0.08)] text-center text-xs text-[#64748b] dark:text-[#94a3b8] no-print">
         <div className="max-w-[1120px] mx-auto px-4">
           <p className="m-0 font-medium">
-            Minimal Blogs, create with ❤️ by VeMines
+            {APP_FOOTER}
           </p>
         </div>
       </footer>

@@ -2,6 +2,8 @@ import type { PostMeta, TagItem } from '../types/blog';
 import { storage } from './storage';
 
 export const R2_PUBLIC_URL = (import.meta.env.VITE_R2_PUBLIC_URL as string) || '';
+export const APP_TITLE = (import.meta.env.VITE_APP_TITLE as string) || 'Minimal Blogs';
+export const APP_FOOTER = (import.meta.env.VITE_APP_FOOTER as string) || 'Minimal Blogs, create with ❤️ by VeMines';
 
 // Returns the subpath base URL if hosted on GitHub Pages or configured via BASE_URL (e.g., '/minimal-blogs')
 export const getAppBase = (): string => {
