@@ -120,7 +120,7 @@ for (let i = 0; i < totalCount; i++) {
   const sec = ((i * 23) % 60).toString().padStart(2, '0');
   const year = 2026;
   const datetimeStr = `${year}-${monthNum}-${dateNum} ${hour}:${min}:${sec}`;
-  
+
   if (i === 0) {
     posts.push({
       id: 0,
@@ -136,7 +136,7 @@ for (let i = 0; i < totalCount; i++) {
       const variantSuffix = Math.floor(i / sampleTopics.length) + 1;
       title = `${template.title} (Part ${variantSuffix})`;
     }
-    
+
     const baseTags = template.tags.slice(0, 3);
     const extraTag = ((i * 5) % 22) + 1;
     const finalTags = Array.from(new Set([...baseTags, extraTag]));

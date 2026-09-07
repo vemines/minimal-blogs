@@ -11,6 +11,8 @@ import type { CalloutType } from './Callout';
 import { ImageZoomModal } from './ImageZoomModal';
 import { DownloadCard } from './DownloadCard';
 import { TabSwitcher } from './TabSwitcher';
+import { VideoPlayer } from './VideoPlayer';
+import { isVideoUrl } from './videoUtils';
 import { R2_PUBLIC_URL, getEffectiveDataBaseUrl } from '../../services/api';
 
 interface MarkdownRendererProps {
@@ -205,6 +207,43 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
                 }
               }
 
+              // Special handler for ```video codeblock
+              if (lang === 'video') {
+                const rawText = String(children || '').trim();
+                const lines = rawText.split('\n');
+                const videoData: Record<string, string> = {};
+
+                const firstLine = lines[0].trim();
+                if (lines.length === 1 && !firstLine.includes(':')) {
+                  return <VideoPlayer src={firstLine} />;
+                }
+
+                for (const line of lines) {
+                  const colonIdx = line.indexOf(':');
+                  if (colonIdx !== -1) {
+                    const key = line.slice(0, colonIdx).trim().toLowerCase();
+                    const val = line.slice(colonIdx + 1).trim();
+                    videoData[key] = val;
+                  } else if (line.trim().startsWith('http://') || line.trim().startsWith('https://') || line.trim().startsWith('/')) {
+                    if (!videoData.url && !videoData.src) {
+                      videoData.src = line.trim();
+                    }
+                  }
+                }
+
+                return (
+                  <VideoPlayer
+                    src={videoData.url || videoData.src}
+                    title={videoData.title}
+                    poster={videoData.poster}
+                    autoPlay={videoData.autoplay === 'true'}
+                    loop={videoData.loop === 'true'}
+                    muted={videoData.muted === 'true'}
+                    controls={videoData.controls !== 'false'}
+                  />
+                );
+              }
+
               // Extract title from code attributes if present (e.g. ```bat title="test.bat")
               let title = '';
               if (node?.data?.meta && typeof node.data.meta === 'string') {
@@ -219,12 +258,12 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
               );
             },
 
-            // Unwrap <pre> for custom rich components (tabs, download) so they don't inherit monospace / whitespace-pre
+            // Unwrap <pre> for custom rich components (tabs, download, video) so they don't inherit monospace / whitespace-pre
             pre({ node, children, ...props }) {
               const codeChild = (node?.children?.[0] as any);
               const className = codeChild?.properties?.className;
               const cls = Array.isArray(className) ? className.join(' ') : String(className || '');
-              if (cls.includes('language-tabs') || cls.includes('language-download')) {
+              if (cls.includes('language-tabs') || cls.includes('language-download') || cls.includes('language-video')) {
                 return <>{children}</>;
               }
               return <pre {...props}>{children}</pre>;
@@ -297,8 +336,11 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
               );
             },
 
-            // 3. Images with Lightbox Zoom & R2 URL prefixing
+            // 3. Images with Lightbox Zoom & R2 URL prefixing (or VideoPlayer if source is video)
             img({ src, alt }) {
+              if (isVideoUrl(src)) {
+                return <VideoPlayer src={src} title={alt} />;
+              }
               const fullSrc = getFullImageUrl(src);
               return (
                 <span className="block my-6 text-center not-prose print:my-4 print:block">
@@ -316,6 +358,40 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
                     </span>
                   )}
                 </span>
+              );
+            },
+
+            // 3.1. HTML5 Video tag support: <video src="..." poster="..." ... />
+            video({ src, poster, controls = true, autoPlay, loop, muted, className, ...props }: any) {
+              return (
+                <VideoPlayer
+                  src={src}
+                  poster={poster}
+                  controls={controls}
+                  autoPlay={autoPlay}
+                  loop={loop}
+                  muted={muted}
+                  className={className}
+                  {...props}
+                />
+              );
+            },
+
+            // 3.2. Responsive Iframe support for YouTube, Vimeo, Loom, Cloudflare Stream
+            iframe({ src, title, className, ...props }: any) {
+              if (!src) return null;
+              return (
+                <div className={`not-prose my-6 aspect-video w-full rounded-2xl overflow-hidden border border-zinc-200 dark:border-[rgba(255,255,255,0.12)] shadow-md bg-black/90 print:hidden ${className || ''}`}>
+                  <iframe
+                    src={src}
+                    title={title || 'Trình phát video'}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    loading="lazy"
+                    {...props}
+                  />
+                </div>
               );
             },
 
