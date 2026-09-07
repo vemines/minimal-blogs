@@ -213,27 +213,43 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
                 const lines = rawText.split('\n');
                 const videoData: Record<string, string> = {};
 
-                const firstLine = lines[0].trim();
-                if (lines.length === 1 && !firstLine.includes(':')) {
-                  return <VideoPlayer src={firstLine} />;
+                // If single line or raw URL
+                const trimmed = rawText.trim();
+                if (
+                  !trimmed.includes('\n') &&
+                  (trimmed.startsWith('http://') ||
+                    trimmed.startsWith('https://') ||
+                    trimmed.startsWith('/') ||
+                    isVideoUrl(trimmed))
+                ) {
+                  return <VideoPlayer src={trimmed} />;
                 }
 
+                const knownKeys = ['url', 'src', 'title', 'poster', 'autoplay', 'loop', 'muted', 'controls', 'aspectratio'];
                 for (const line of lines) {
-                  const colonIdx = line.indexOf(':');
-                  if (colonIdx !== -1) {
-                    const key = line.slice(0, colonIdx).trim().toLowerCase();
-                    const val = line.slice(colonIdx + 1).trim();
-                    videoData[key] = val;
-                  } else if (line.trim().startsWith('http://') || line.trim().startsWith('https://') || line.trim().startsWith('/')) {
+                  const trimmedLine = line.trim();
+                  if (!trimmedLine) continue;
+
+                  const colonIdx = trimmedLine.indexOf(':');
+                  const possibleKey = colonIdx !== -1 ? trimmedLine.slice(0, colonIdx).trim().toLowerCase() : '';
+
+                  if (knownKeys.includes(possibleKey)) {
+                    videoData[possibleKey] = trimmedLine.slice(colonIdx + 1).trim();
+                  } else if (
+                    trimmedLine.startsWith('http://') ||
+                    trimmedLine.startsWith('https://') ||
+                    trimmedLine.startsWith('/') ||
+                    isVideoUrl(trimmedLine)
+                  ) {
                     if (!videoData.url && !videoData.src) {
-                      videoData.src = line.trim();
+                      videoData.src = trimmedLine;
                     }
                   }
                 }
 
                 return (
                   <VideoPlayer
-                    src={videoData.url || videoData.src}
+                    src={videoData.url || videoData.src || trimmed}
                     title={videoData.title}
                     poster={videoData.poster}
                     autoPlay={videoData.autoplay === 'true'}
@@ -470,8 +486,18 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
               return <span className="block my-2.5" />;
             },
 
-            // 7. Safe Links: only permit safe schemes, block javascript:
+            // 7. Safe Links & Autolinked Videos
             a({ href, children, ...props }) {
+              // If user simply pasted a video URL on its own line (autolink)
+              if (
+                href &&
+                isVideoUrl(href) &&
+                typeof children === 'string' &&
+                (children.trim() === href.trim() || isVideoUrl(children))
+              ) {
+                return <VideoPlayer src={href} />;
+              }
+
               const isSafe = !href || /^(https?:\/\/|\/|#|mailto:|tel:)/i.test(href.trim());
               const safeHref = isSafe ? href : '#';
               const isExternal = safeHref?.startsWith('http');

@@ -1,14 +1,98 @@
-[
+﻿[
   {
     "id": 1,
-    "name": "Hướng Dẫn"
+    "name": "Performance"
   },
   {
     "id": 2,
-    "name": "Máy In"
+    "name": "Frontend"
   },
   {
     "id": 3,
-    "name": "Mạng LAN"
+    "name": "Design System"
+  },
+  {
+    "id": 4,
+    "name": "Browser API"
+  },
+  {
+    "id": 5,
+    "name": "Architecture"
+  },
+  {
+    "id": 6,
+    "name": "Offline Cache"
+  },
+  {
+    "id": 7,
+    "name": "React 19"
+  },
+  {
+    "id": 8,
+    "name": "Security"
+  },
+  {
+    "id": 9,
+    "name": "Web APIs"
+  },
+  {
+    "id": 10,
+    "name": "Node.js"
+  },
+  {
+    "id": 11,
+    "name": "Runtimes"
+  },
+  {
+    "id": 12,
+    "name": "Engineering"
+  },
+  {
+    "id": 13,
+    "name": "TypeScript"
+  },
+  {
+    "id": 14,
+    "name": "DevOps"
+  },
+  {
+    "id": 15,
+    "name": "Components"
+  },
+  {
+    "id": 16,
+    "name": "Tailwind CSS"
+  },
+  {
+    "id": 17,
+    "name": "Markdown"
+  },
+  {
+    "id": 18,
+    "name": "UI / UX"
+  },
+  {
+    "id": 19,
+    "name": "Clean Code"
+  },
+  {
+    "id": 20,
+    "name": "JavaScript"
+  },
+  {
+    "id": 21,
+    "name": "Web Development"
+  },
+  {
+    "id": 22,
+    "name": "Best Practices"
+  },
+  {
+    "id": 23,
+    "name": "Testing"
+  },
+  {
+    "id": 24,
+    "name": "Vite"
   }
 ]
