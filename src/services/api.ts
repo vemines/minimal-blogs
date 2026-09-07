@@ -3,9 +3,39 @@ import { storage } from './storage';
 
 export const R2_PUBLIC_URL = (import.meta.env.VITE_R2_PUBLIC_URL as string) || '';
 
+// Returns the subpath base URL if hosted on GitHub Pages or configured via BASE_URL (e.g., '/minimal-blogs')
+export const getAppBase = (): string => {
+  if (typeof window !== 'undefined') {
+    const { pathname, hostname } = window.location;
+    if (hostname.endsWith('github.io')) {
+      const firstSegment = pathname.split('/').filter(Boolean)[0];
+      if (firstSegment) {
+        return `/${firstSegment}`;
+      }
+    }
+    const base = import.meta.env.BASE_URL;
+    if (base && base !== './' && base !== '/') {
+      return base.replace(/\/+$/, '');
+    }
+  }
+  return '';
+};
+
 // Base URL for blog data (posts.txt, tags.json, pinned.txt, posts/*.md).
-// Defaults to empty string for same-origin relative paths (/posts.txt, etc.)
-export const DATA_BASE_URL = ((import.meta.env.VITE_DATA_BASE_URL as string) || '').replace(/\/+$/, '');
+export const getEffectiveDataBaseUrl = (): string => {
+  if (import.meta.env.VITE_DATA_BASE_URL) {
+    return (import.meta.env.VITE_DATA_BASE_URL as string).replace(/\/+$/, '');
+  }
+  if (typeof window !== 'undefined') {
+    const appBase = getAppBase();
+    if (appBase) {
+      return `${window.location.origin}${appBase}`;
+    }
+  }
+  return '';
+};
+
+export const DATA_BASE_URL = getEffectiveDataBaseUrl();
 
 interface MemoryCacheItem {
   content: string;
@@ -63,7 +93,8 @@ export function hasMemoryCache(id: number, expectedDate?: string): boolean {
  */
 export async function fetchPosts(): Promise<{ posts: PostMeta[]; isOffline: boolean }> {
   try {
-    const res = await fetch(`${DATA_BASE_URL}/posts.txt?t=${Date.now()}`);
+    const baseUrl = getEffectiveDataBaseUrl();
+    const res = await fetch(`${baseUrl}/posts.txt?t=${Date.now()}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
 
     let jsonString: string;
@@ -99,7 +130,8 @@ export async function fetchPosts(): Promise<{ posts: PostMeta[]; isOffline: bool
 export async function fetchTags(): Promise<TagItem[]> {
   if (cachedTags) return cachedTags;
   try {
-    const res = await fetch(`${DATA_BASE_URL}/tags.json?t=${Date.now()}`);
+    const baseUrl = getEffectiveDataBaseUrl();
+    const res = await fetch(`${baseUrl}/tags.json?t=${Date.now()}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     cachedTags = await res.json();
     storage.setCachedTags(cachedTags!);
@@ -121,7 +153,8 @@ export async function fetchTags(): Promise<TagItem[]> {
 export async function fetchPinnedIds(): Promise<number[]> {
   if (cachedPinnedIds) return cachedPinnedIds;
   try {
-    const res = await fetch(`${DATA_BASE_URL}/pinned.txt?t=${Date.now()}`);
+    const baseUrl = getEffectiveDataBaseUrl();
+    const res = await fetch(`${baseUrl}/pinned.txt?t=${Date.now()}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
     cachedPinnedIds = text
@@ -170,7 +203,8 @@ export async function fetchPostContent(
 
   // 3. Date does not match or not in cache: fetch fresh content from network
   try {
-    const res = await fetch(`${DATA_BASE_URL}/posts/${id}.md?t=${now}`);
+    const baseUrl = getEffectiveDataBaseUrl();
+    const res = await fetch(`${baseUrl}/posts/${id}.md?t=${now}`);
 
     if (res.status === 404) {
       // Post markdown does not exist yet. Explicitly throw NOT_FOUND, DO NOT cache placeholder

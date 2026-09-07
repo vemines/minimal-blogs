@@ -11,7 +11,7 @@ import type { CalloutType } from './Callout';
 import { ImageZoomModal } from './ImageZoomModal';
 import { DownloadCard } from './DownloadCard';
 import { TabSwitcher } from './TabSwitcher';
-import { R2_PUBLIC_URL } from '../../services/api';
+import { R2_PUBLIC_URL, getEffectiveDataBaseUrl } from '../../services/api';
 
 interface MarkdownRendererProps {
   content: string;
@@ -133,7 +133,9 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
       return src;
     }
     if (!R2_PUBLIC_URL) {
-      return src.startsWith('/') ? src : `/${src}`;
+      const base = getEffectiveDataBaseUrl();
+      const cleanSrc = src.replace(/^\/+/, '');
+      return base ? `${base}/${cleanSrc}` : (src.startsWith('/') ? src : `/${src}`);
     }
     const cleanR2 = R2_PUBLIC_URL.replace(/\/+$/, '');
     const cleanSrc = src.replace(/^\/+/, '');

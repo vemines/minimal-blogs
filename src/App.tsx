@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import type { PostMeta, TagItem } from './types/blog';
-import { fetchPosts, fetchTags, fetchPinnedIds } from './services/api';
+import { fetchPosts, fetchTags, fetchPinnedIds, getAppBase } from './services/api';
 import { storage } from './services/storage';
 import { Header } from './components/layout/Header';
 import { HomeView } from './views/HomeView';
@@ -38,8 +38,28 @@ export function App() {
       const hash = window.location.hash;
       const search = new URLSearchParams(window.location.search);
 
-      // Check /saved
-      if (path === '/saved' || hash === '#/saved' || hash === '#saved') {
+      // Check ?p=posts/0 or ?p=saved (from SPA 404.html redirect)
+      const pParam = search.get('p');
+      if (pParam) {
+        const appBase = getAppBase();
+        const pMatch = pParam.match(/posts?[-/](\d+)/);
+        if (pMatch) {
+          const postId = parseInt(pMatch[1], 10);
+          setCurrentPostId(postId);
+          setIsSavedRoute(false);
+          window.history.replaceState(null, '', `${appBase}/posts/${postId}`);
+          return;
+        }
+        if (pParam.includes('saved')) {
+          setIsSavedRoute(true);
+          setCurrentPostId(null);
+          window.history.replaceState(null, '', `${appBase}/saved`);
+          return;
+        }
+      }
+
+      // Check /saved or ?saved=true
+      if (path === '/saved' || path.endsWith('/saved') || hash === '#/saved' || hash === '#saved' || search.get('saved') === 'true') {
         setIsSavedRoute(true);
         setCurrentPostId(null);
         return;
@@ -133,19 +153,22 @@ export function App() {
   const navigateToPost = (id: number) => {
     setCurrentPostId(id);
     setIsSavedRoute(false);
-    window.history.pushState(null, '', `/posts/${id}`);
+    const appBase = getAppBase();
+    window.history.pushState(null, '', `${appBase}/posts/${id}`);
   };
 
   const navigateToHome = () => {
     setCurrentPostId(null);
     setIsSavedRoute(false);
-    window.history.pushState(null, '', '/');
+    const appBase = getAppBase();
+    window.history.pushState(null, '', appBase ? `${appBase}/` : '/');
   };
 
   const navigateToSaved = () => {
     setIsSavedRoute(true);
     setCurrentPostId(null);
-    window.history.pushState(null, '', '/saved');
+    const appBase = getAppBase();
+    window.history.pushState(null, '', `${appBase}/saved`);
   };
 
   // Theme toggle
