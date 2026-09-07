@@ -1,0 +1,110 @@
+================================================================================
+                    CẨM NANG HƯỚNG DẪN QUẢN TRỊ DỮ LIỆU BLOG
+                     (DATA ARCHITECTURE & OPERATIONS GUIDE)
+================================================================================
+
+1. CẤU TRÚC 2 KHO DỮ LIỆU (TWO-REPO ARCHITECTURE)
+--------------------------------------------------------------------------------
+
+   - Đường dẫn: ./ (Thư mục gốc của Web App)
+   - Vai trò: Giao diện người dùng, bộ định tuyến, trình dựng Markdown, giải nén.
+   - Chạy thử nghiệm cục bộ: npm run dev (http://localhost:5173)
+
+
+2. QUY CHUẨN ĐỊNH DẠNG CÁC TỆP TIN DỮ LIỆU (DATA FORMATS)
+--------------------------------------------------------------------------------
+Mỗi bài viết gồm 2 phần liên kết chặt chẽ qua số ID nguyên:
+
+• posts.json / data.json (Chỉ dùng cục bộ trong repo Web App):
+  Chứa danh sách metadata của các bài viết để sinh ra file nén posts.txt:
+  [
+    {
+      "id": 0,
+      "title": "Tiêu đề bài viết ngắn gọn, rõ ràng",
+      "summary": "Đoạn tóm tắt từ 1 - 2 câu hiển thị trên thẻ bài viết.",
+      "datetime": "2026-03-12 14:30:00",
+      "tags": [1]
+    }
+  ]
+  * Hệ thống dùng trường datetime (chính xác đến giây HH:mm:ss) để kiểm tra bài viết có cập nhật mới hay không.
+  * Trên giao diện thẻ bài viết và trang chi tiết, giây (:ss) được tự động ẩn (chỉ hiển thị YYYY-MM-DD HH:mm).
+  LƯU Ý: Không đẩy file posts.json lên repo configs.
+  Trên configs repo chỉ lưu: posts.txt (đã nén), tags.json, pinned.txt và posts/*.md.
+
+• tags.json:
+  Danh mục các chủ đề bài viết. Mỗi tag gồm ID số và Tên nhãn:
+  [
+    { "id": 1, "name": "Máy in" },
+    { "id": 2, "name": "Mạng LAN" }
+  ]
+
+• pinned.txt:
+  Danh sách các ID bài viết muốn ghim nổi bật lên đầu trang chủ.
+  Mỗi dòng chứa đúng 1 số ID (ví dụ: dòng 1 ghi số 0).
+
+• posts/<id>.md:
+  File văn bản Markdown chứa toàn bộ nội dung bài viết chi tiết.
+  Lưu ý: Không viết lại thẻ tiêu đề H1 ở đầu file, vì giao diện đã tự render
+  tiêu đề lớn từ thuộc tính title trong posts.json.
+
+• posts.txt:
+  Tệp nén nhị phân Gzip của posts.json. Ứng dụng web tải tệp này và giải nén
+  trực tiếp trong RAM bằng Web Stream API DecompressionStream('gzip').
+  Giúp giảm kích thước tải qua mạng từ 25KB xuống chỉ còn 3KB (giảm 88%).
+
+
+3. PHÂN BIỆT CLEAN DATA (DỮ LIỆU THẬT) VS MOCK DATA (DỮ LIỆU KIỂM THỬ)
+--------------------------------------------------------------------------------
+• Clean Data (Dữ Liệu Thật / Production Khi Khởi Tạo Ban Đầu):
+  - Được lưu tại kho configs (ví dụ: ../configs/blogs/helpdesk hoặc GitHub repo)
+  - posts.json: Mảng rỗng []
+  - posts.txt: Tệp nhị phân Gzip của [] (đúng 22 bytes).
+  - tags.json: [{ "id": 1, "name": "Hướng Dẫn" }]
+  - pinned.txt: Rỗng (0 bytes).
+  - Khi viết bài đầu tiên, ID sẽ bắt đầu từ 0 hoặc 1.
+
+• Mock Data (Dữ Liệu Kiểm Thử Giao Diện):
+  - Dùng khi cần kiểm tra giao diện phân trang (Pagination), thanh tìm kiếm với
+    số lượng lớn 80 bài viết.
+  - Được sinh ra bằng lệnh: node scripts/generate-posts.js
+
+
+4. QUY TRÌNH THÊM MỘT BÀI VIẾT MỚI (STEP-BY-STEP GUIDE)
+--------------------------------------------------------------------------------
+Khi bạn hoặc AI Agent muốn viết thêm một bài viết mới, hãy làm theo 6 bước:
+
+Bước 1: Chọn ID bài viết tiếp theo
+  - Mở file posts.json và xem bài viết có ID lớn nhất hiện tại.
+  - Ví dụ bài hiện tại cao nhất là ID 2 -> Bài mới sẽ là ID 3.
+
+Bước 2: Soạn nội dung Markdown
+  - Tạo file: posts/3.md (trong thư mục public/posts/ hoặc repo configs)
+  - Soạn nội dung theo chuẩn Markdown có hỗ trợ Callout, Code Block, Tabs...
+
+Bước 3: Khai báo bài viết vào posts.json
+  - Thêm một khối JSON mới vào đầu hoặc cuối mảng posts.json:
+    {
+      "id": 3,
+      "title": "Hướng dẫn xử lý lỗi...",
+      "summary": "Tóm tắt các bước giải quyết...",
+      "date": "2026-09-06",
+      "tags": [1, 2]
+    }
+
+Bước 4: Nén lại file posts.txt
+  - Chạy lệnh:
+    npm run compress
+  - Kịch bản sẽ tự động nén posts.json thành posts.txt trong thư mục scripts/
+    và thư mục public/posts.txt.
+
+Bước 5: Kiểm tra hiển thị cục bộ
+  - Mở http://localhost:5173/posts/3 để xem bài viết render chuẩn hay chưa.
+
+
+5. BẢNG TRA CỨU NHANH CÁC LỆNH TIỆN ÍCH (COMMAND CHEATSHEET)
+--------------------------------------------------------------------------------
+• npm run dev       : Khởi chạy máy chủ phát triển cục bộ (localhost:5173).
+• npm run compress  : Nén file data.json thành posts.txt (chuẩn Gzip).
+• npm run build     : Biên dịch kiểm tra lỗi TypeScript và đóng gói ứng dụng.
+• npm run lint      : Quét lỗi cú pháp mã nguồn bằng linter Oxlint siêu tốc.
+================================================================================
