@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Pin } from 'lucide-react';
+import { Pin, FileText, SearchX, RotateCcw } from 'lucide-react';
 import type { PostMeta, TagItem } from '../types/blog';
 import { PostCard } from '../components/home/PostCard';
 import { Pagination } from '../components/home/Pagination';
@@ -171,6 +171,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           ))}
         </div>
+      ) : posts.length === 0 ? (
+        /* ─── DEDICATED EMPTY BLOG STATE (Initial Clean State or No Posts Published) ─── */
+        <div className="text-center py-20 px-6 border border-zinc-200 dark:border-[rgba(255,255,255,0.1)] rounded-3xl bg-white dark:bg-[#18191e] shadow-xs max-w-md mx-auto my-10">
+          <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-[#1976d2] dark:text-[#90caf9] border border-blue-100 dark:border-blue-900/50 flex items-center justify-center">
+            <FileText className="w-7 h-7" />
+          </div>
+          <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-1.5">
+            Chưa có bài viết nào
+          </h3>
+          <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-xs mx-auto leading-relaxed">
+            Hệ thống blog hiện chưa có bài viết nào được xuất bản. Vui lòng quay lại sau!
+          </p>
+        </div>
       ) : (
         <>
           {/* ─── DEDICATED PINNED POSTS SECTION ─── */}
@@ -210,11 +223,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 />
               ))}
             </main>
-          ) : (
-            /* Empty Search State */
-            <div className="text-center py-16 px-4 border border-dashed border-[#cbd5e1] dark:border-[rgba(255,255,255,0.15)] rounded-2xl bg-white dark:bg-[#18191e]">
-              <p className="text-[#475569] dark:text-[#94a3b8] text-sm mb-3">
-                Không tìm thấy bài viết nào phù hợp với bộ lọc hiện tại.
+          ) : isSearchingOrFiltering ? (
+            /* ─── EMPTY FILTER / SEARCH RESULT STATE ─── */
+            <div className="text-center py-16 px-6 border border-dashed border-[#cbd5e1] dark:border-[rgba(255,255,255,0.15)] rounded-3xl bg-white dark:bg-[#18191e] shadow-xs max-w-md mx-auto my-8">
+              <div className="w-12 h-12 mx-auto mb-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800/80 text-zinc-500 dark:text-zinc-400 flex items-center justify-center">
+                <SearchX className="w-6 h-6" />
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 mb-1">
+                Không tìm thấy bài viết phù hợp
+              </h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-5 max-w-xs mx-auto leading-relaxed">
+                Không có bài viết nào khớp với từ khóa tìm kiếm hoặc danh mục đã chọn.
               </p>
               <button
                 type="button"
@@ -222,12 +241,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   setSearchQuery('');
                   setSelectedTagId(null);
                 }}
-                className="text-xs font-mono text-[#1976d2] dark:text-[#90caf9] hover:underline cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#1976d2] hover:bg-[#1565c0] text-white shadow-sm hover:shadow transition-all cursor-pointer"
               >
-                Xóa tất cả bộ lọc để xem lại
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Xóa bộ lọc tìm kiếm</span>
               </button>
             </div>
-          )}
+          ) : null}
 
           {/* Fixed 7-Item Pagination */}
           <Pagination
