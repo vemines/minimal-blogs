@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -125,8 +125,68 @@ const InteractiveCheckbox: React.FC<React.InputHTMLAttributes<HTMLInputElement>>
   );
 };
 
+/**
+ * Normalizes ```tabs code blocks to use at least 4 backticks if they contain
+ * nested 3-backtick code blocks (e.g. ```video, ```bash) to prevent CommonMark
+ * from prematurely closing the tabs fence.
+ */
+const normalizeTabsCodeBlocks = (markdown: string): string => {
+  if (!markdown || !markdown.includes('tabs')) return markdown;
+
+  const lines = markdown.split(/\r?\n/);
+  const result: string[] = [];
+  let inTabs = false;
+  let innerFenceDepth = 0;
+  let tabsFenceChar = '`';
+  let tabsFenceLen = 3;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Check if starting a tabs block
+    const tabsMatch = line.match(/^\s{0,3}(`{3,}|~{3,})tabs\s*$/);
+    if (!inTabs && tabsMatch) {
+      inTabs = true;
+      tabsFenceChar = tabsMatch[1][0];
+      tabsFenceLen = tabsMatch[1].length;
+      innerFenceDepth = 0;
+      const upgradeFence = tabsFenceChar.repeat(Math.max(4, tabsFenceLen + 1));
+      result.push(upgradeFence + 'tabs');
+      continue;
+    }
+
+    if (inTabs) {
+      const innerOpenMatch = line.match(/^\s{0,3}(`{3,}|~{3,})[a-zA-Z0-9_-]+\s*$/);
+      const fenceCloseMatch = line.match(/^\s{0,3}(`{3,}|~{3,})\s*$/);
+
+      if (innerOpenMatch) {
+        innerFenceDepth++;
+        result.push(line);
+      } else if (fenceCloseMatch) {
+        if (innerFenceDepth > 0) {
+          innerFenceDepth--;
+          result.push(line);
+        } else {
+          inTabs = false;
+          const upgradeFence = tabsFenceChar.repeat(Math.max(4, tabsFenceLen + 1));
+          result.push(upgradeFence);
+        }
+      } else {
+        result.push(line);
+      }
+      continue;
+    }
+
+    result.push(line);
+  }
+
+  return result.join('\n');
+};
+
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
   const [zoomImage, setZoomImage] = useState<{ src: string; alt?: string } | null>(null);
+
+  const processedContent = useMemo(() => normalizeTabsCodeBlocks(content), [content]);
 
   // Helper to normalize image URLs with R2 prefix if configured, otherwise keep relative
   const getFullImageUrl = (src?: string) => {
@@ -664,7 +724,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
             },
           }}
         >
-          {content}
+          {processedContent}
         </ReactMarkdown>
       </div>
 
