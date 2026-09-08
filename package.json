@@ -7,8 +7,10 @@
   "scripts": {
     "dev": "vite",
     "dev:helpdesk": "vite --mode helpdesk",
+    "dev:demo": "vite --mode demo",
     "build": "tsc -b && vite build",
     "build:helpdesk": "tsc -b && vite build --mode helpdesk",
+    "build:demo": "tsc -b && vite build --mode demo",
     "lint": "oxlint",
     "preview": "vite preview",
     "generate": "node scripts/generate-posts.js",

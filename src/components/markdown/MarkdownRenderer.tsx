@@ -203,7 +203,12 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
                   }
                 }
                 if (parsedTabs.length > 0) {
-                  return <TabSwitcher tabs={parsedTabs} />;
+                  return (
+                    <TabSwitcher
+                      tabs={parsedTabs}
+                      onZoomImage={(src, alt) => setZoomImage({ src, alt })}
+                    />
+                  );
                 }
               }
 
@@ -646,7 +651,12 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
                 });
 
                 if (parsedTabs.length > 0) {
-                  return <TabSwitcher tabs={parsedTabs} />;
+                  return (
+                    <TabSwitcher
+                      tabs={parsedTabs}
+                      onZoomImage={(src, alt) => setZoomImage({ src, alt })}
+                    />
+                  );
                 }
               }
 

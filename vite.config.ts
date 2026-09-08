@@ -14,10 +14,18 @@ const base = process.env.GITHUB_REPOSITORY ? `/${process.env.GITHUB_REPOSITORY.s
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const appTitle = env.VITE_APP_TITLE || 'Minimal Blogs';
+  const isDemo = mode === 'demo' || Boolean(process.env.GITHUB_ACTIONS);
+  const appTitle = isDemo ? 'Minimal Blogs' : (env.VITE_APP_TITLE || 'Minimal Blogs');
+  const shouldCleanupDemoData = !isDemo && (Boolean(env.VITE_DATA_BASE_URL) || mode === 'helpdesk');
 
   return {
     base,
+    define: isDemo
+      ? {
+          'import.meta.env.VITE_DATA_BASE_URL': JSON.stringify(''),
+          'import.meta.env.VITE_APP_TITLE': JSON.stringify('Minimal Blogs'),
+        }
+      : {},
     plugins: [
       tailwindcss(),
       react(),
@@ -27,27 +35,32 @@ export default defineConfig(({ mode }) => {
           return html.replace(/<title>.*?<\/title>/, `<title>${appTitle}</title>`);
         },
       },
-      {
-        name: 'cleanup-dist-data',
-        closeBundle() {
-          const distDir = path.resolve(__dirname, 'dist');
-          const itemsToRemove = [
-            'posts',
-            '_redirects',
-            '404.html',
-            'posts.json',
-            'posts.txt',
-            'tags.json',
-            'pinned.txt',
-          ];
-          for (const item of itemsToRemove) {
-            const target = path.join(distDir, item);
-            if (fs.existsSync(target)) {
-              fs.rmSync(target, { recursive: true, force: true });
-            }
-          }
-        },
-      },
+      // Only remove local demo post data when building for external CDN (not demo)
+      ...(shouldCleanupDemoData
+        ? [
+            {
+              name: 'cleanup-dist-data',
+              closeBundle() {
+                const distDir = path.resolve(__dirname, 'dist');
+                const itemsToRemove = [
+                  'posts',
+                  'posts.json',
+                  'posts.txt',
+                  'tags.json',
+                  'pinned.txt',
+                  '404.html',
+                  '_redirects',
+                ];
+                for (const item of itemsToRemove) {
+                  const target = path.join(distDir, item);
+                  if (fs.existsSync(target)) {
+                    fs.rmSync(target, { recursive: true, force: true });
+                  }
+                }
+              },
+            },
+          ]
+        : []),
     ],
     build: {
       rollupOptions: {

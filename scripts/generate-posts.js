@@ -127,7 +127,6 @@ for (let i = 0; i < totalCount; i++) {
       title: template.title,
       summary: template.summary,
       datetime: `2026-03-12 10:30:00`,
-      date: `2026-03-12 10:30:00`,
       tags: [15, 16, 17]
     });
   } else {
@@ -146,7 +145,6 @@ for (let i = 0; i < totalCount; i++) {
       title: title,
       summary: template.summary,
       datetime: datetimeStr,
-      date: datetimeStr,
       tags: finalTags
     });
   }

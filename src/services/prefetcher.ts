@@ -8,6 +8,7 @@ const inFlightRequests = new Set<number>();
  * Prefetches a post content into memory cache
  */
 export async function prefetchPost(id: number, date?: string): Promise<void> {
+  if (import.meta.env.DEV) return; // In dev mode, skip prefetching to ensure fresh on-demand fetching
   if (hasMemoryCache(id, date) || inFlightRequests.has(id)) {
     return;
   }

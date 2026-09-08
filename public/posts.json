@@ -4,7 +4,6 @@
     "title": "UI & Component Showcase: Markdown Styling & Component System",
     "summary": "Interactive demonstration of all supported rich markdown elements, alerts, code blocks, tab switchers, and media components.",
     "datetime": "2026-09-07 10:35:00",
-    "date": "2026-09-07 10:35:00",
     "tags": [
       15,
       16,
@@ -16,12 +15,23 @@
     "title": "Exploring Modern Frontend Architectures and Micro-Frontends",
     "summary": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     "datetime": "2026-04-02 09:17:23",
-    "date": "2026-04-02 09:17:23",
     "tags": [
       2,
       5,
       21,
       6
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Hướng dẫn chia sẻ máy in qua mạng LAN trên Windows 10 và 11",
+    "summary": "Quy trình thiết lập chia sẻ máy in qua Computer Name, hướng dẫn xử lý mã lỗi 0x0000011b, 0x00000709.",
+    "datetime": "2026-09-07 15:10:00",
+    "tags": [
+      25,
+      26,
+      27,
+      28
     ]
   }
 ]

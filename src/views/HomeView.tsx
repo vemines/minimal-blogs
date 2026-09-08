@@ -181,7 +181,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             Chưa có bài viết nào
           </h3>
           <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 max-w-xs mx-auto leading-relaxed">
-            Hệ thống blog hiện chưa có bài viết nào được xuất bản. Vui lòng quay lại sau!
+            Website hiện chưa có bài viết nào. Vui lòng quay lại sau!
           </p>
         </div>
       ) : (

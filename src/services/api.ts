@@ -68,6 +68,9 @@ export function isDateFresh(cachedDate?: string, expectedDate?: string): boolean
  * to avoid flashing loading skeleton on navigation or page refresh.
  */
 export function getSynchronousPostContent(id: number, expectedDate?: string): string | null {
+  if (import.meta.env.DEV) {
+    return null; // Never use synchronous cache in DEV so edits to .md files show immediately
+  }
   const mem = memoryCache.get(id);
   if (mem && isDateFresh(mem.date, expectedDate)) {
     return mem.content;
@@ -82,6 +85,9 @@ export function getSynchronousPostContent(id: number, expectedDate?: string): st
 }
 
 export function hasMemoryCache(id: number, expectedDate?: string): boolean {
+  if (import.meta.env.DEV) {
+    return false;
+  }
   const item = memoryCache.get(id);
   if (!item) return false;
   if (!isDateFresh(item.date, expectedDate)) {
@@ -92,10 +98,25 @@ export function hasMemoryCache(id: number, expectedDate?: string): boolean {
 
 /**
  * Fetches the compressed post index (/posts.txt) and decompresses it client-side via DecompressionStream('gzip')
+ * In DEV mode, fetches /posts.json directly so edits are instantly visible without running compress!
  */
 export async function fetchPosts(): Promise<{ posts: PostMeta[]; isOffline: boolean }> {
   try {
     const baseUrl = getEffectiveDataBaseUrl();
+
+    // In DEV mode, load posts.json directly so changes to posts.json appear immediately without running npm run compress
+    if (import.meta.env.DEV) {
+      try {
+        const res = await fetch(`${baseUrl}/posts.json?t=${Date.now()}`);
+        if (res.ok) {
+          const data: PostMeta[] = await res.json();
+          return { posts: data, isOffline: false };
+        }
+      } catch (devErr) {
+        console.warn('Failed to load posts.json in dev mode, falling back to posts.txt:', devErr);
+      }
+    }
+
     const res = await fetch(`${baseUrl}/posts.txt?t=${Date.now()}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
 
@@ -130,7 +151,7 @@ export async function fetchPosts(): Promise<{ posts: PostMeta[]; isOffline: bool
  * Fetches tags metadata (tags.json) with offline storage fallback
  */
 export async function fetchTags(): Promise<TagItem[]> {
-  if (cachedTags) return cachedTags;
+  if (!import.meta.env.DEV && cachedTags) return cachedTags;
   try {
     const baseUrl = getEffectiveDataBaseUrl();
     const res = await fetch(`${baseUrl}/tags.json?t=${Date.now()}`);
@@ -153,7 +174,7 @@ export async function fetchTags(): Promise<TagItem[]> {
  * Fetches pinned post IDs from pinned.txt with offline storage fallback
  */
 export async function fetchPinnedIds(): Promise<number[]> {
-  if (cachedPinnedIds) return cachedPinnedIds;
+  if (!import.meta.env.DEV && cachedPinnedIds) return cachedPinnedIds;
   try {
     const baseUrl = getEffectiveDataBaseUrl();
     const res = await fetch(`${baseUrl}/pinned.txt?t=${Date.now()}`);
@@ -179,9 +200,8 @@ export async function fetchPinnedIds(): Promise<number[]> {
 
 /**
  * Fetches markdown content for a post by numeric ID (/posts/<id>.md).
- * Compares datetime: if post.date matches cached.date, returns cache immediately (0ms).
- * If date changed or not cached, fetches newest post from network and updates cache.
- * Throws 'NOT_FOUND' if post markdown does not exist (HTTP 404 or HTML SPA fallback).
+ * In DEV mode, bypasses memory and localStorage cache completely so edits update instantly!
+ * In production, compares datetime: if post.date matches cached.date, returns cache immediately (0ms).
  */
 export async function fetchPostContent(
   id: number,
@@ -189,21 +209,25 @@ export async function fetchPostContent(
 ): Promise<{ content: string; fromCache: boolean }> {
   const now = Date.now();
 
-  // 1. Check in-memory cache first: if date matches, return 0ms
-  const mem = memoryCache.get(id);
-  if (mem && isDateFresh(mem.date, expectedDate) && now - mem.timestamp < CACHE_TTL_MS) {
-    return { content: mem.content, fromCache: true };
+  // In production, check cache first (0ms load).
+  // In development mode, bypass cache completely so any edits to .md files show immediately upon refresh!
+  if (!import.meta.env.DEV) {
+    // 1. Check in-memory cache first: if date matches, return 0ms
+    const mem = memoryCache.get(id);
+    if (mem && isDateFresh(mem.date, expectedDate) && now - mem.timestamp < CACHE_TTL_MS) {
+      return { content: mem.content, fromCache: true };
+    }
+
+    // 2. Check localStorage cache: if date matches, promote to RAM and return 0ms
+    const localCached = storage.getCachedPostContent(id);
+    if (localCached && isDateFresh(localCached.date, expectedDate)) {
+      const cleaned = localCached.content.replace(/^#\s+[^\r\n]+[\r\n]*/, '').trim();
+      memoryCache.set(id, { content: cleaned, date: expectedDate || localCached.date, timestamp: now });
+      return { content: cleaned, fromCache: true };
+    }
   }
 
-  // 2. Check localStorage cache: if date matches, promote to RAM and return 0ms
-  const localCached = storage.getCachedPostContent(id);
-  if (localCached && isDateFresh(localCached.date, expectedDate)) {
-    const cleaned = localCached.content.replace(/^#\s+[^\r\n]+[\r\n]*/, '').trim();
-    memoryCache.set(id, { content: cleaned, date: expectedDate || localCached.date, timestamp: now });
-    return { content: cleaned, fromCache: true };
-  }
-
-  // 3. Date does not match or not in cache: fetch fresh content from network
+  // 3. Date does not match or not in cache (or DEV mode): fetch fresh content from network
   try {
     const baseUrl = getEffectiveDataBaseUrl();
     const res = await fetch(`${baseUrl}/posts/${id}.md?t=${now}`);
@@ -232,14 +256,17 @@ export async function fetchPostContent(
     // Strip leading H1 title if present to avoid duplicating the post header title
     text = text.replace(/^#\s+[^\r\n]+[\r\n]*/, '').trim();
 
-    // Save genuine content with datetime to caches
-    memoryCache.set(id, { content: text, date: expectedDate, timestamp: now });
-    storage.setCachedPostContent(id, text, expectedDate);
+    // Save genuine content to caches only in production
+    if (!import.meta.env.DEV) {
+      memoryCache.set(id, { content: text, date: expectedDate, timestamp: now });
+      storage.setCachedPostContent(id, text, expectedDate);
+    }
 
     return { content: text, fromCache: false };
   } catch (error: any) {
     // 4. Fallback to localStorage cache if offline or fetch fails (but not for 404 unwritten posts)
     if (error?.message !== 'NOT_FOUND') {
+      const localCached = storage.getCachedPostContent(id);
       if (localCached) {
         const cleaned = localCached.content.replace(/^#\s+[^\r\n]+[\r\n]*/, '').trim();
         memoryCache.set(id, { content: cleaned, date: localCached.date, timestamp: now });
@@ -254,5 +281,6 @@ export async function fetchPostContent(
  * Directly primes the in-memory cache (used by prefetcher)
  */
 export function setMemoryCache(id: number, content: string, date?: string) {
+  if (import.meta.env.DEV) return;
   memoryCache.set(id, { content, date, timestamp: Date.now() });
 }

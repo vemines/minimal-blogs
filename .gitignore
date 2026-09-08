@@ -25,3 +25,5 @@ dist-ssr
 temp/
 scratch/
 .env
+.env.production
+.env.helpdesk

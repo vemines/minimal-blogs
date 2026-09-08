@@ -87,7 +87,7 @@ Bước 3: Khai báo bài viết vào posts.json
       "id": 3,
       "title": "Hướng dẫn xử lý lỗi...",
       "summary": "Tóm tắt các bước giải quyết...",
-      "date": "2026-09-06",
+      "datetime": "2026-09-06 14:30:00",
       "tags": [1, 2]
     }
 

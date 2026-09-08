@@ -30,7 +30,11 @@ const TECH_TAGS = [
   { id: 21, name: "Web Development" },
   { id: 22, name: "Best Practices" },
   { id: 23, name: "Testing" },
-  { id: 24, name: "Vite" }
+  { id: 24, name: "Vite" },
+  { id: 25, name: "Hướng Dẫn" },
+  { id: 26, name: "Mạng & Máy In" },
+  { id: 27, name: "Windows 10 / 11" },
+  { id: 28, name: "Khắc Phục Sự Cố" }
 ];
 
 const LOREM_TAGS = [
