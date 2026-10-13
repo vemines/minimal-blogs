@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "title": "Hướng dẫn khởi tạo và quản trị bài viết trên Minimal Blogs",
+    "summary": "Tài liệu mẫu hướng dẫn cách chỉnh sửa data.json, tạo bài viết Markdown và triển khai kho dữ liệu tĩnh.",
+    "datetime": "2026-10-13 09:00:00",
+    "tags": [
+      1,
+      2
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Quy trình Minify JSON và triển khai kho bài viết lên GitHub Pages",
+    "summary": "Chỉnh sửa thuận tiện bằng data.json, chạy lệnh minify sinh posts.json siêu nhẹ để phục vụ môi trường production.",
+    "datetime": "2026-10-13 09:30:00",
+    "tags": [
+      1,
+      3
+    ]
+  }
+]

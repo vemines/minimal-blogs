@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "name": "Máy In"
+  },
+  {
+    "id": 2,
+    "name": "Lan"
+  },
+  {
+    "id": 3,
+    "name": "iCPV"
+  },
+  {
+    "id": 4,
+    "name": "KPI"
+  },
+  {
+    "id": 5,
+    "name": "Vân tay"
+  },
+  {
+    "id": 6,
+    "name": "HIS"
+  },
+  {
+    "id": 7,
+    "name": "Phần mềm"
+  },
+  {
+    "id": 8,
+    "name": "Công cụ"
+  },
+  {
+    "id": 99,
+    "name": "Components"
+  },
+  {
+    "id": 98,
+    "name": "Tailwind CSS"
+  },
+  {
+    "id": 97,
+    "name": "Markdown"
+  }
+]

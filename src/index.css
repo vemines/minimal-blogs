@@ -1,0 +1,686 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: #fafafa; /* zinc-50 */
+    color: #18181b; /* zinc-900 */
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  html.dark body {
+    background-color: #18181b; /* zinc-900 */
+    color: #f4f4f5; /* zinc-100 */
+  }
+
+  /* ─── THIN MODERN SCROLLBAR (LIGHT & DARK MODE) ─── */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  html.dark * {
+    scrollbar-width: thin;
+    scrollbar-color: #3b404d transparent;
+  }
+
+  /* Webkit browsers (Chrome, Edge, Safari) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+  }
+
+  html.dark ::-webkit-scrollbar-thumb {
+    background-color: #3b404d;
+  }
+
+  html.dark ::-webkit-scrollbar-thumb:hover {
+    background-color: #555c6e;
+  }
+
+  /* Custom kbd styling */
+  kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.15rem 0.4rem;
+    font-size: 0.75rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 600;
+    line-height: 1;
+    color: #27272a;
+    background-color: #f4f4f5;
+    border: 1px solid #d4d4d8;
+    border-bottom: 2px solid #a1a1aa;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  }
+
+  html.dark kbd {
+    color: #e4e4e7;
+    background-color: #27272a;
+    border-color: #3f3f46;
+    border-bottom-color: #52525b;
+  }
+
+  /* ─── REMOVE NUMBER INPUT CHEVRONS/SPINNERS ─── */
+  input.no-spinner::-webkit-inner-spin-button,
+  input.no-spinner::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+  }
+
+  input.no-spinner,
+  input[type=number] {
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+  }
+}
+
+/* ─── DO'S & DON'TS TABLE (SCREEN STYLES) ─── */
+.dos-donts-table th:first-child {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border-bottom: 2px solid #86efac;
+}
+
+html.dark .dos-donts-table th:first-child {
+  background-color: rgba(6, 78, 59, 0.35);
+  color: #6ee7b7;
+  border-bottom: 2px solid rgba(16, 185, 129, 0.4);
+}
+
+.dos-donts-table th:last-child {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border-bottom: 2px solid #fca5a5;
+}
+
+html.dark .dos-donts-table th:last-child {
+  background-color: rgba(136, 19, 55, 0.35);
+  color: #fda4af;
+  border-bottom: 2px solid rgba(244, 63, 94, 0.4);
+}
+
+.dos-donts-table td:first-child {
+  background-color: #fafffc;
+  color: #166534;
+  border-right: 1px solid #dcfce7;
+}
+
+html.dark .dos-donts-table td:first-child {
+  background-color: rgba(6, 78, 59, 0.15);
+  color: #d1fae5;
+  border-right: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.dos-donts-table td:last-child {
+  background-color: #fffafa;
+  color: #991b1b;
+}
+
+html.dark .dos-donts-table td:last-child {
+  background-color: rgba(136, 19, 55, 0.15);
+  color: #ffe4e6;
+}
+
+/* ─── TASK LIST & FORM INPUT ITEMS IN MARKDOWN ─── */
+.markdown-body ul.contains-task-list,
+.markdown-body ul:has(> li > input[type="radio"]),
+.markdown-body ul:has(> li > input[type="checkbox"]),
+.markdown-body ul:has(> li > p > input[type="radio"]),
+.markdown-body ul:has(> li > p > input[type="checkbox"]) {
+  list-style-type: none !important;
+  padding-left: 0 !important;
+}
+
+.markdown-body li.task-list-item,
+.markdown-body li:has(> input[type="radio"]),
+.markdown-body li:has(> input[type="checkbox"]),
+.markdown-body li:has(> p > input[type="radio"]),
+.markdown-body li:has(> p > input[type="checkbox"]) {
+  list-style-type: none !important;
+  padding-left: 0 !important;
+}
+
+/* ─── TAB SWITCHER SMOOTH FADE ANIMATION ─── */
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tab-fade-in {
+  animation: tabFadeIn 0.18s ease-out forwards;
+}
+
+/* ─── PROCEDURAL STEPS & MARKDOWN LISTS ─── */
+.markdown-body ol {
+  list-style-type: decimal;
+  padding-left: 1.75rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.markdown-body ol > li {
+  padding-left: 0.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.markdown-body ul:not(.contains-task-list) {
+  list-style-type: disc;
+  padding-left: 1.75rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-body ul:not(.contains-task-list) > li {
+  padding-left: 0.25rem;
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.markdown-body ol ul,
+.markdown-body ul ul {
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+  padding-left: 1.5rem;
+}
+
+/* ─── PROFESSIONAL PRINT & PDF STYLES (LIGHT THEME GUARANTEE) ─── */
+@media print {
+  @page {
+    margin: 12mm 12mm 12mm 12mm;
+    size: auto;
+  }
+
+  *, *::before, *::after {
+    text-shadow: none !important;
+    filter: none !important;
+    box-shadow: none !important;
+  }
+
+  /* ─── ALWAYS PURE LIGHT THEME IN PRINT ─── */
+  :root,
+  html,
+  body,
+  .dark,
+  .dark html,
+  .dark body {
+    color-scheme: light !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    font-size: 10.5pt !important;
+    line-height: 1.5 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Reset all containers, cards, and articles to pure white / transparent */
+  article,
+  .dark article,
+  .dark div,
+  .dark section {
+    background-color: transparent !important;
+    color: #1e293b !important;
+    box-shadow: none !important;
+  }
+
+  /* Invert dark typography to crisp dark slate */
+  .dark p,
+  .dark span,
+  .dark li {
+    color: #1e293b !important;
+  }
+
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4,
+  .dark h5,
+  .dark h6 {
+    color: #0f172a !important;
+  }
+
+  /* Reset Tailwind prose-invert variables to crisp light */
+  .dark .prose-invert,
+  .prose {
+    --tw-prose-body: #1e293b !important;
+    --tw-prose-headings: #0f172a !important;
+    --tw-prose-lead: #334155 !important;
+    --tw-prose-links: #1976d2 !important;
+    --tw-prose-bold: #0f172a !important;
+    --tw-prose-counters: #475569 !important;
+    --tw-prose-bullets: #475569 !important;
+    --tw-prose-hr: #cbd5e1 !important;
+    --tw-prose-quotes: #334155 !important;
+    --tw-prose-quote-borders: #cbd5e1 !important;
+    --tw-prose-captions: #64748b !important;
+    --tw-prose-code: #0f172a !important;
+    --tw-prose-pre-code: #0f172a !important;
+    --tw-prose-pre-bg: #f8fafc !important;
+    --tw-prose-th-borders: #cbd5e1 !important;
+    --tw-prose-td-borders: #e2e8f0 !important;
+    color: #1e293b !important;
+  }
+
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print,
+  nav,
+  header,
+  footer,
+  aside,
+  button,
+  .fab-scroll,
+  .search-container,
+  .tag-filter-container,
+  .print-hide {
+    display: none !important;
+  }
+
+  .print-show {
+    display: block !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  article {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  h1 {
+    font-size: 18pt !important;
+    line-height: 1.3 !important;
+    margin-bottom: 8pt !important;
+  }
+
+  h2 {
+    font-size: 13.5pt !important;
+    margin-top: 14pt !important;
+    margin-bottom: 6pt !important;
+    border-bottom: 1px solid #cbd5e1 !important;
+    padding-bottom: 3pt !important;
+  }
+
+  h3 {
+    font-size: 11.5pt !important;
+    margin-top: 10pt !important;
+    margin-bottom: 4pt !important;
+  }
+
+  p, li, span {
+    color: #1e293b !important;
+  }
+
+  a {
+    text-decoration: none !important;
+    color: #1976d2 !important;
+  }
+
+  pre, blockquote, table, img, figure, .accordion-item, .download-card, .dos-donts-container {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  pre, code {
+    border: 1px solid #cbd5e1 !important;
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    font-size: 8.5pt !important;
+    white-space: pre-wrap !important;
+    word-break: break-all;
+  }
+
+  code:not(pre code) {
+    background-color: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 1pt 3pt !important;
+    border-radius: 3px !important;
+  }
+
+  blockquote {
+    border-left: 3px solid #1976d2 !important;
+    background-color: #f8fafc !important;
+    padding: 6pt 10pt !important;
+    margin: 8pt 0 !important;
+    color: #334155 !important;
+  }
+
+  /* ─── 1. KEYCAPS (<kbd>) IN PRINT ─── */
+  kbd,
+  html.dark kbd,
+  .dark kbd,
+  .markdown-body kbd,
+  .dark .markdown-body kbd {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #f1f5f9 !important;
+    background: #f1f5f9 !important;
+    color: #1e293b !important;
+    border: 1px solid #cbd5e1 !important;
+    border-bottom: 2px solid #94a3b8 !important;
+    border-radius: 4px !important;
+    padding: 1pt 5pt !important;
+    font-size: 8pt !important;
+    font-weight: 600 !important;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    line-height: 1.2 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ─── 2. STANDARD TABLES IN PRINT ─── */
+  table,
+  .dark table,
+  .markdown-body table,
+  .dark .markdown-body table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    min-width: unset !important;
+    margin: 8pt 0 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  th,
+  .dark th,
+  .markdown-body th,
+  .dark .markdown-body th {
+    background-color: #f8fafc !important;
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    font-size: 8.5pt !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 5pt 8pt !important;
+    text-align: left !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  td,
+  .dark td,
+  .markdown-body td,
+  .dark .markdown-body td {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    font-size: 8.5pt !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 5pt 8pt !important;
+    line-height: 1.4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ─── 3. COLLAPSIBLE ACCORDION (<details> & <summary>) IN PRINT ─── */
+  details,
+  .dark details,
+  html.dark details,
+  .accordion-item,
+  .dark .accordion-item {
+    display: block !important;
+    background-color: #f8fafc !important;
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 8pt 10pt !important;
+    margin: 6pt 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Always expand details in print so no documentation is hidden */
+  details > *:not(summary) {
+    display: block !important;
+    margin-top: 4pt !important;
+    color: #334155 !important;
+    font-size: 8.5pt !important;
+  }
+
+  summary,
+  .dark summary,
+  html.dark summary {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4pt !important;
+    font-size: 9.5pt !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding-bottom: 3pt !important;
+    margin-bottom: 4pt !important;
+    list-style: none !important;
+    cursor: default !important;
+  }
+
+  summary::-webkit-details-marker {
+    display: none !important;
+  }
+
+  summary span {
+    color: #1976d2 !important;
+  }
+
+  /* ─── 4. DO'S & DON'TS TABLES IN PRINT ─── */
+  .dos-donts-container,
+  .dark .dos-donts-container {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+    margin: 8pt 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    background: #ffffff !important;
+  }
+
+  .dos-donts-table,
+  .dark .dos-donts-table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    min-width: unset !important;
+    margin: 0 !important;
+    background-color: #ffffff !important;
+  }
+
+  .dos-donts-table th:first-child,
+  .dark .dos-donts-table th:first-child {
+    background-color: #f0fdf4 !important;
+    color: #166534 !important;
+    font-weight: bold !important;
+    border: 1px solid #bbf7d0 !important;
+    border-bottom: 2px solid #86efac !important;
+    padding: 6pt 8pt !important;
+    font-size: 8.5pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .dos-donts-table th:last-child,
+  .dark .dos-donts-table th:last-child {
+    background-color: #fef2f2 !important;
+    color: #991b1b !important;
+    font-weight: bold !important;
+    border: 1px solid #fecaca !important;
+    border-bottom: 2px solid #fca5a5 !important;
+    padding: 6pt 8pt !important;
+    font-size: 8.5pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .dos-donts-table td:first-child,
+  .dark .dos-donts-table td:first-child {
+    background-color: #fafffc !important;
+    color: #14532d !important;
+    border: 1px solid #dcfce7 !important;
+    padding: 6pt 8pt !important;
+    font-size: 8.5pt !important;
+    line-height: 1.4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .dos-donts-table td:last-child,
+  .dark .dos-donts-table td:last-child {
+    background-color: #fffafa !important;
+    color: #7f1d1d !important;
+    border: 1px solid #fee2e2 !important;
+    padding: 6pt 8pt !important;
+    font-size: 8.5pt !important;
+    line-height: 1.4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ─── 5. DOWNLOAD CARDS IN PRINT ─── */
+  .download-card,
+  a.download-card,
+  .dark .download-card,
+  .dark a.download-card {
+    display: flex !important;
+    align-items: flex-start !important;
+    background-color: #f8fafc !important;
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 8pt 10pt !important;
+    margin: 6pt 0 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .download-card h4,
+  .dark .download-card h4 {
+    color: #0f172a !important;
+    font-size: 9.5pt !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+  }
+
+  .download-card p,
+  .dark .download-card p {
+    color: #475569 !important;
+    font-size: 8.5pt !important;
+    margin-top: 2pt !important;
+    line-height: 1.3 !important;
+  }
+
+  .download-card span,
+  .dark .download-card span {
+    color: #64748b !important;
+    font-size: 8pt !important;
+  }
+
+  .download-card svg,
+  .dark .download-card svg {
+    color: #1976d2 !important;
+    stroke: #1976d2 !important;
+  }
+
+  /* ─── OPTIMIZED COMPACT / COMPRESSED PDF MODE ─── */
+  body.print-compressed {
+    font-size: 9.5pt !important;
+    line-height: 1.4 !important;
+  }
+
+  body.print-compressed img {
+    max-height: 250px !important;
+    object-fit: contain !important;
+  }
+
+  body.print-compressed h1 {
+    font-size: 15pt !important;
+    margin-bottom: 6pt !important;
+  }
+
+  body.print-compressed h2 {
+    font-size: 11.5pt !important;
+    margin-top: 10pt !important;
+    margin-bottom: 4pt !important;
+  }
+
+  body.print-compressed h3 {
+    font-size: 10pt !important;
+    margin-top: 8pt !important;
+    margin-bottom: 3pt !important;
+  }
+
+  body.print-compressed pre,
+  body.print-compressed blockquote,
+  body.print-compressed table {
+    margin: 5pt 0 !important;
+  }
+}
