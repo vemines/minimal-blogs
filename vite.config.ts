@@ -8,8 +8,8 @@ import tailwindcss from '@tailwindcss/vite'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Auto-detect GitHub repository name in GitHub Actions CI, otherwise use relative './'
-const base = process.env.GITHUB_REPOSITORY ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/` : './';
+// Support custom base path (e.g. GitHub Pages project repo), default to '/' for SPA routing on custom domains / Cloudflare Pages
+const base = process.env.VITE_APP_BASE || (process.env.GITHUB_REPOSITORY ? `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/` : '/');
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -48,8 +48,7 @@ export default defineConfig(({ mode }) => {
                 'posts.txt',
                 'tags.json',
                 'pinned.txt',
-                '404.html',
-                '_redirects',
+                'data.json',
               ];
               for (const item of itemsToRemove) {
                 const target = path.join(distDir, item);
